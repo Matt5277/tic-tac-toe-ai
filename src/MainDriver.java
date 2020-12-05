@@ -15,13 +15,29 @@ public class MainDriver {
     private static void restartGame() {
         int input = 0;
         while (input != 1 && input != 2) {
-            input = InputProvider.getNumberInput("Do you want to play single player (1) or multiplayer (2)? ");
+            input = InputProvider.getNumberInput("Do you want to start AI learning mode (1) or play against AI (2)? ");
         }
         if (input == 1) {
-            playSinglePlayer();
+            startLearningMode();
         } else {
-            playMultiPlayer();
+            // playAgainstAI();
         }
     }
+
+    private static void startLearningMode() {
+        AI.startLearning(new Player('X'), new Player('O'),
+                InputProvider.getNumberInput("How many games should the AI play? "));
+    }
+
+    // private static void playAgainstAI() {
+    // Player player = new Player(InputProvider.getCharInput("What character do you
+    // wish to be? "));
+    // Player ai = new Player((player.getSymbol() == 'X' || player.getSymbol() ==
+    // 'x') ? 'O' : 'X');
+    // boolean gameOver = false;
+    // while (!gameOver) {
+
+    // }
+    // }
 
 }

@@ -35,6 +35,10 @@ public class GameBoard {
         }
     }
 
+    public ArrayList<Integer> getAvailablePositions() {
+        return availablePositions;
+    }
+
     public void printBoard() {
         int start;
         ArrayList<Character> list;
