@@ -1,15 +1,11 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class MainDriver {
     public static void main(String[] args) {
         restartGame();
-        // Player test1 = new Player('X');
-        // Player test2 = new Player('O');
-        // gameBoard.makeMove(0, test1);
-        // gameBoard.makeMove(1, test2);
-        // gameBoard.makeMove(8, test1);
-        // gameBoard.makeMove(4, test1);
-        // gameBoard.printBoard();
     }
 
     private static void restartGame() {
@@ -20,7 +16,7 @@ public class MainDriver {
         if (input == 1) {
             startLearningMode();
         } else {
-            // playAgainstAI();
+            playAgainstAI();
         }
     }
 
@@ -29,15 +25,66 @@ public class MainDriver {
                 InputProvider.getNumberInput("How many games should the AI play? "));
     }
 
-    // private static void playAgainstAI() {
-    // Player player = new Player(InputProvider.getCharInput("What character do you
-    // wish to be? "));
-    // Player ai = new Player((player.getSymbol() == 'X' || player.getSymbol() ==
-    // 'x') ? 'O' : 'X');
-    // boolean gameOver = false;
-    // while (!gameOver) {
+    private static void playAgainstAI() {
+        Map<String, Integer> aiGameHistory = AI.extractHistoryFromFile();
+        Player player = new Player(InputProvider.getCharInput("What character do you wish to be? "));
+        Player ai = new Player((player.getSymbol() == 'X' || player.getSymbol() == 'x') ? 'O' : 'X');
+        GameBoard gameBoard = new GameBoard();
+        ArrayList possibleMoves;
+        boolean win = false;
+        String gameRecord = "";
+        while (true) {
+            possibleMoves = gameBoard.getAvailablePositions();
+            int move = -1;
+            while (!possibleMoves.contains(move)) {
+                System.out.println("\nThese are the possible moves:\n" + possibleMoves.toString());
+                move = InputProvider.getNumberInput("Please select one: ");
+            }
 
-    // }
-    // }
+            win = gameBoard.makeMove(move, player);
+            gameRecord += move;
+            gameBoard.printBoard();
+            if (gameBoard.getAvailablePositions().isEmpty()) {
+                if (win) {
+                    gameRecord += 'W';
+                    System.out.println("\nYou win!!!");
+                    break;
+                } else {
+                    gameRecord += 'T';
+                    System.out.println("\nThe game ended in a tie :///");
+                    break;
+                }
+            } else if (win) {
+                gameRecord += 'W';
+                System.out.println("\nYou win!!!");
+                break;
+            }
+
+            System.out.println("\nAI move:");
+            int nextMove = AI.getNextBestMove(gameRecord, aiGameHistory, gameBoard);
+            win = gameBoard.makeMove(nextMove, ai);
+            gameRecord += nextMove;
+            gameBoard.printBoard();
+
+            if (gameBoard.getAvailablePositions().isEmpty()) {
+                if (win) {
+                    gameRecord += 'L';
+                    System.out.println("\nThe AI won :///");
+                    break;
+                } else {
+                    gameRecord += 'T';
+                    System.out.println("\nThe game ended in a tie :///");
+                    break;
+                }
+            } else if (win) {
+                gameRecord += 'L';
+                System.out.println("\nThe AI won :///");
+                break;
+            }
+
+        }
+        Integer numb = aiGameHistory.get(gameRecord);
+        AI.appendToLog(gameRecord + "-" + (numb == null ? 1 : numb + 1));
+    }
 
 }

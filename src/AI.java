@@ -1,13 +1,16 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AI {
@@ -97,7 +100,7 @@ public class AI {
     public static int getNextBestMove(String gameRecord, Map<String, Integer> gameHistory, GameBoard gameBoard) {
         int gameRecordLength = gameRecord.length();
         if (gameRecordLength == 0) {
-            return getPositionFromArray(gameBoard.getAvailablePositions(), gameBoard);
+            return getBestPositionFromArray(gameBoard.getAvailablePositions(), gameBoard);
         }
         List<Integer> possibleMoves = (ArrayList<Integer>) gameBoard.getAvailablePositions().clone();
         Map<String, Integer> lossMap, winMap;
@@ -111,40 +114,43 @@ public class AI {
             winMap = extractRelevantGameData(gameHistory, gameRecord, WinLose.WIN);
         }
 
-        for (String key : lossMap.keySet()) {
-            char lastChar = key.charAt(key.length() - 1);
-            String winKey = key.substring(0, key.length() - 1) + (lastChar == 'W' ? 'L' : 'W');
-            if (winMap.get(winKey) == null) {
-                possibleMoves.remove((Integer) Integer.parseInt(key.charAt(gameRecordLength) + ""));
-            }
-        }
-
-        int min = 12;
-        for (String key : winMap.keySet()) {
-            char lastChar = key.charAt(key.length() - 1);
-            String lossKey = key.substring(0, key.length() - 1) + (lastChar == 'W' ? 'L' : 'W');
-            Integer lossKeyValue = lossMap.get(lossKey);
-            Integer winKeyValue = winMap.get(key);
-            if ((lossKeyValue == null || winKeyValue >= lossKeyValue) && key.length() < min) {
-                min = key.length();
-            }
-        }
-
         List<Integer> bestPositions = new ArrayList<>();
-        for (String key : winMap.keySet()) {
-            int value = Integer.parseInt(key.charAt(gameRecordLength) + "");
-            if (key.length() == min && possibleMoves.contains(value)) {
-                bestPositions.add(value);
+        for (String key : lossMap.keySet()) {
+            if (key.startsWith(gameRecord)) {
+                int index = key.indexOf(gameRecord) + gameRecordLength;
+                if (index == key.length() - 3) {
+                    possibleMoves.remove((Integer) Integer.parseInt(key.charAt(index) + ""));
+                }
             }
         }
 
-        return getPositionFromArray(bestPositions.isEmpty() ? possibleMoves : bestPositions, gameBoard);
+        for (String key : lossMap.keySet()) {
+            int index = key.lastIndexOf(gameRecord) + gameRecordLength + 1;
+            if (index < key.length() - 1) {
+                Integer numb = Integer.parseInt(key.charAt(index) + "");
+                if (possibleMoves.contains(numb)) {
+                    bestPositions.add(numb);
+                }
+            }
+        }
+
+        for (String key : winMap.keySet()) {
+            int index = key.indexOf(gameRecord) + gameRecordLength;
+            if (key.length() - 2 == index) {
+                bestPositions.add(Integer.parseInt(key.charAt(index) + ""));
+            }
+        }
+
+        return getBestPositionFromArray(
+                bestPositions.isEmpty() ? possibleMoves.isEmpty() ? gameBoard.getAvailablePositions() : possibleMoves
+                        : bestPositions,
+                gameBoard);
     }
 
     private static Map<String, Integer> extractRelevantGameData(Map<String, Integer> gameHistory, String gameRecord,
             WinLose winOrLoseData) {
         return gameHistory.entrySet().stream()
-                .filter(map -> map.getKey().startsWith(gameRecord)
+                .filter(map -> map.getKey().contains(gameRecord)
                         && map.getKey().endsWith(winOrLoseData == WinLose.WIN ? "W" : "L"))
                 .collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
     }
@@ -154,11 +160,11 @@ public class AI {
         if (gameRecord.length() == 0) {
             return filteredGameHistory;
         }
-        return filteredGameHistory.entrySet().stream().filter(map -> map.getKey().startsWith(gameRecord))
+        return filteredGameHistory.entrySet().stream().filter(map -> map.getKey().contains(gameRecord))
                 .collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
     }
 
-    private static int getPositionFromArray(List<Integer> possibilities, GameBoard gameBoard) {
+    private static int getBestPositionFromArray(List<Integer> possibilities, GameBoard gameBoard) {
         int rand;
         if (possibilities.isEmpty()) {
             ArrayList poss = gameBoard.getAvailablePositions();
@@ -169,7 +175,7 @@ public class AI {
         return possibilities.get(rand);
     }
 
-    public static Map<String, Integer> extractAIDataFromFile() {
+    public static Map<String, Integer> extractHistoryFromFile() {
         Map<String, Integer> returnMap = new HashMap<>();
         try {
             Scanner scan = new Scanner(new File(aiLogFileName));
@@ -186,5 +192,15 @@ public class AI {
             e.printStackTrace();
         }
         return returnMap;
+    }
+
+    public static void appendToLog(String gameRecord) {
+        try {
+            PrintStream out = new PrintStream(new FileOutputStream(aiLogFileName, true));
+            out.append(gameRecord + "\n");
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
