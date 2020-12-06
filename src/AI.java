@@ -23,7 +23,7 @@ public class AI {
 
     public static void startLearning(Player ai1, Player ai2, int numbGames) {
         GameBoard gameBoard = new GameBoard();
-        Map<String, Integer> filteredGameHistory = new HashMap<>(), gameHistory = new HashMap<>();
+        Map<String, Integer> filteredGameHistory = new HashMap<>(), gameHistory = extractHistoryFromFile();
         boolean gameError;
         String gameRecord;
         for (int i = 0; i < numbGames; i++) {
