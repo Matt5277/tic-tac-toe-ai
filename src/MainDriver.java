@@ -1,7 +1,5 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class MainDriver {
     public static void main(String[] args) {
@@ -11,7 +9,7 @@ public class MainDriver {
     private static void restartGame() {
         int input = 0;
         while (input != 1 && input != 2) {
-            input = InputProvider.getNumberInput("Do you want to start AI learning mode (1) or play against AI (2)? ");
+            input = InputProvider.getNumbInput("Do you want to start AI learning mode (1) or play against AI (2)? ");
         }
         if (input == 1) {
             startLearningMode();
@@ -22,7 +20,7 @@ public class MainDriver {
 
     private static void startLearningMode() {
         AI.startLearning(new Player('X'), new Player('O'),
-                InputProvider.getNumberInput("How many games should the AI play? "));
+                InputProvider.getNumbInput("How many games should the AI play? "));
     }
 
     private static void playAgainstAI() {
@@ -34,17 +32,17 @@ public class MainDriver {
         boolean win = false;
         String gameRecord = "";
         while (true) {
-            possibleMoves = gameBoard.getAvailablePositions();
+            possibleMoves = gameBoard.getAvailableMoves();
             int move = -1;
             while (!possibleMoves.contains(move)) {
                 System.out.println("\nThese are the possible moves:\n" + possibleMoves.toString());
-                move = InputProvider.getNumberInput("Please select one: ");
+                move = InputProvider.getNumbInput("Please select one: ");
             }
 
             win = gameBoard.makeMove(move, player);
             gameRecord += move;
             gameBoard.printBoard();
-            if (gameBoard.getAvailablePositions().isEmpty()) {
+            if (gameBoard.getAvailableMoves().isEmpty()) {
                 if (win) {
                     gameRecord += 'W';
                     System.out.println("\nYou win!!!");
@@ -66,7 +64,7 @@ public class MainDriver {
             gameRecord += nextMove;
             gameBoard.printBoard();
 
-            if (gameBoard.getAvailablePositions().isEmpty()) {
+            if (gameBoard.getAvailableMoves().isEmpty()) {
                 if (win) {
                     gameRecord += 'L';
                     System.out.println("\nThe AI won :///");

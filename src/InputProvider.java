@@ -4,11 +4,11 @@ public class InputProvider {
 
     private static Scanner userIn = new Scanner(System.in);
 
-    public static int getNumberInput(String prompt) {
-        return getNumberInput(prompt, false);
+    public static int getNumbInput(String prompt) {
+        return getNumbInput(prompt, false);
     }
 
-    private static int getNumberInput(String prompt, boolean nan) {
+    private static int getNumbInput(String prompt, boolean nan) {
         try {
             if (nan) {
                 System.out.println("\nPlease enter a valid number.");
@@ -16,7 +16,7 @@ public class InputProvider {
             System.out.print(prompt);
             return Integer.parseInt(userIn.next());
         } catch (NumberFormatException e) {
-            getNumberInput(prompt, true);
+            getNumbInput(prompt, true);
         }
         return 0;
     }

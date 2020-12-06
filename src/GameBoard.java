@@ -1,17 +1,18 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public class GameBoard {
-    private ArrayList<Integer> availablePositions;
-    private HashMap<Integer, Player> board;
+    private ArrayList<Integer> availableMoves;
+    private Map<Integer, Player> board;
 
     public GameBoard() {
         resetBoard();
     }
 
     public void resetBoard() {
-        availablePositions = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8));
+        availableMoves = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8));
         board = new HashMap<>();
     }
 
@@ -24,19 +25,19 @@ public class GameBoard {
         }
     }
 
-    public boolean makeMove(int position, Player player) {
-        if (availablePositions.contains(position)) {
-            board.put(position, player);
-            availablePositions.remove((Integer) position);
+    public boolean makeMove(int move, Player player) {
+        if (availableMoves.contains(move)) {
+            board.put(move, player);
+            availableMoves.remove((Integer) move);
             return checkWin(0, 1) || checkWin(0, 3) || checkWin(0, 4) || checkWin(1, 3) || checkWin(2, 3)
                     || checkWin(2, 2) || checkWin(3, 1) || checkWin(6, 1);
         } else {
-            throw new Error("Position not available");
+            throw new Error("Move not available");
         }
     }
 
-    public ArrayList<Integer> getAvailablePositions() {
-        return availablePositions;
+    public ArrayList<Integer> getAvailableMoves() {
+        return availableMoves;
     }
 
     public void printBoard() {
