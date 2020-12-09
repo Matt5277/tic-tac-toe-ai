@@ -213,8 +213,7 @@ public class AI {
             }
             scan.close();
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            return returnMap;
         }
         return returnMap;
     }
